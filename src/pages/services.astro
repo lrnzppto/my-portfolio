@@ -1,0 +1,97 @@
+---
+import Base from '../layouts/Base.astro';
+import CtaBand from '../components/CtaBand.astro';
+import { site } from '../site.config';
+import { getServices, getPublishedProjects, getFaq } from '../lib/content';
+
+const services = await getServices();
+const projects = await getPublishedProjects();
+const faq = await getFaq();
+const hasWork = (id: string) => projects.some((p) => p.data.categories.some((c) => c.id === id));
+---
+<Base title="Services" description="Web design and development, graphic design, video editing, podcast editing and social media management for personal brands, coaches, creators and small businesses.">
+  <section class="page-head">
+    <div class="wrap">
+      <p class="label">Services</p>
+      <h1>What you'd be getting.</h1>
+      <p class="lede">Everything I offer, what's included, and how working together goes from first message to delivery.</p>
+    </div>
+  </section>
+
+  <section class="section-tight">
+    <div class="wrap">
+      {services.map((s, i) => (
+        <article class="service" id={s.id}>
+          <div>
+            <span class="label">{String(i + 1).padStart(2, '0')}</span>
+            <h2>{s.data.title}</h2>
+            {s.data.status === 'in-development' && <p><span class="badge">In development: ask me about it</span></p>}
+            <p class="muted">{s.data.summary}</p>
+            {hasWork(s.id) && <a class="text-link" href={'/work/?category=' + s.id}>See related work →</a>}
+          </div>
+          <div class="service-detail">
+            {s.data.includes.length > 0 && (
+              <div>
+                <h3>What's included</h3>
+                <ul class="checklist">{s.data.includes.map((x) => <li>{x}</li>)}</ul>
+              </div>
+            )}
+            {s.data.deliverables.length > 0 && (
+              <div>
+                <h3>Deliverables</h3>
+                <ul class="checklist">{s.data.deliverables.map((x) => <li>{x}</li>)}</ul>
+              </div>
+            )}
+            {s.data.turnaround && (
+              <div>
+                <h3>Turnaround</h3>
+                <p>{s.data.turnaround}</p>
+              </div>
+            )}
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section aria-labelledby="process-title">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="label">How it works</p>
+        <h2 id="process-title">Simple, clear, no surprises.</h2>
+      </div>
+      <ol class="steps">
+        <li><strong>Discovery call</strong><span>We start with your goal and your audience, not the tools.</span></li>
+        <li><strong>Proposal</strong><span>You get a clear scope and timeline before any work starts.</span></li>
+        <li><strong>Kickoff</strong><span>We agree on access, channels and the first milestone.</span></li>
+        <li><strong>Delivery</strong><span>I share progress early so you can steer, then hand over tested work and explain it.</span></li>
+        <li><strong>Ongoing support</strong><span>Need more after launch? We keep going from where we left off.</span></li>
+      </ol>
+      <div class="callout" style="margin-top:2.5rem">
+        <p><strong>Pricing.</strong> Every project is scoped to what you actually need, so pricing is discussed on the discovery call instead of a one-size-fits-all package.</p>
+        <a class="btn btn-primary" href={site.bookingUrl} target="_blank" rel="noopener">Book a discovery call</a>
+      </div>
+    </div>
+  </section>
+
+  {faq.length > 0 && (
+    <section aria-labelledby="faq-title">
+      <div class="wrap">
+        <div class="section-head">
+          <p class="label">FAQ</p>
+          <h2 id="faq-title">Common questions.</h2>
+        </div>
+        <div class="faq prose">
+          {faq.map((f) => (
+            <details>
+              <summary>{f.data.question}</summary>
+              <p>{f.data.answer}</p>
+            </details>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <CtaBand />
+</Base>

@@ -1,0 +1,122 @@
+---
+import { site } from '../site.config';
+const SUPABASE_URL = site.supabase.url;
+const SUPABASE_KEY = site.supabase.publishableKey;
+---
+<section id="guestbook" aria-labelledby="guestbook-title">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="label">Guestbook</p>
+      <h2 id="guestbook-title">Leave a note.</h2>
+      <p>Say hi, share feedback or tell me how you found this page.</p>
+    </div>
+    <div class="guestbook">
+      <form class="form" id="gb-form" novalidate>
+        <div class="field">
+          <label for="gb-name">Name</label>
+          <input id="gb-name" name="name" type="text" maxlength="60" autocomplete="name" required />
+        </div>
+        <div class="field">
+          <label for="gb-message">Message</label>
+          <textarea id="gb-message" name="message" maxlength="500" required></textarea>
+          <span class="gb-count" id="gb-count">0 / 500</span>
+        </div>
+        <button class="btn btn-primary" type="submit" id="gb-send" style="justify-self:start">Send</button>
+        <p class="form-status" id="gb-status" role="status" aria-live="polite"></p>
+      </form>
+      <div class="gb-feed">
+        <h3>Latest messages</h3>
+        <ol class="gb-list" id="gb-list"><li class="gb-empty">Loading messages…</li></ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script is:inline define:vars={{ SUPABASE_URL, SUPABASE_KEY }}>
+  // Reads and writes the Supabase "guestbook" table with the publishable key only.
+  // Row Level Security allows reading and adding valid entries; nobody can edit or delete.
+  (function () {
+    var API = SUPABASE_URL + '/rest/v1/guestbook';
+    var headers = { apikey: SUPABASE_KEY, 'Content-Type': 'application/json' };
+    var form = document.getElementById('gb-form');
+    var nameInput = document.getElementById('gb-name');
+    var messageInput = document.getElementById('gb-message');
+    var counter = document.getElementById('gb-count');
+    var sendButton = document.getElementById('gb-send');
+    var status = document.getElementById('gb-status');
+    var list = document.getElementById('gb-list');
+
+    // Visitor text always goes through textContent, never innerHTML, so it can't inject markup.
+    function note(text) {
+      var li = document.createElement('li');
+      li.className = 'gb-empty';
+      li.textContent = text;
+      list.replaceChildren(li);
+    }
+
+    function render(rows) {
+      if (!rows.length) return note('No messages yet. Be the first.');
+      list.replaceChildren.apply(list, rows.map(function (row) {
+        var li = document.createElement('li');
+        li.className = 'gb-entry';
+        var meta = document.createElement('div');
+        meta.className = 'gb-meta';
+        var who = document.createElement('strong');
+        who.textContent = row.name;
+        var when = document.createElement('time');
+        when.dateTime = row.created_at;
+        when.textContent = new Date(row.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+        meta.append(who, when);
+        var body = document.createElement('p');
+        body.textContent = row.message;
+        li.append(meta, body);
+        return li;
+      }));
+    }
+
+    function load() {
+      return fetch(API + '?select=id,name,message,created_at&order=created_at.desc&limit=20', { headers: headers })
+        .then(function (res) { if (!res.ok) throw new Error('HTTP ' + res.status); return res.json(); })
+        .then(render)
+        .catch(function (err) { console.error('Guestbook load failed:', err); note("Couldn't load messages right now."); });
+    }
+
+    function setStatus(text, isError) {
+      status.textContent = text;
+      status.classList.toggle('error', !!isError);
+    }
+
+    messageInput.addEventListener('input', function () {
+      counter.textContent = messageInput.value.length + ' / 500';
+    });
+
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+      var name = nameInput.value.trim();
+      var message = messageInput.value.trim();
+      if (name.length < 1 || name.length > 60) return setStatus('Please add your name (1 to 60 characters).', true);
+      if (message.length < 1 || message.length > 500) return setStatus('Please write a message (1 to 500 characters).', true);
+      sendButton.disabled = true;
+      setStatus('Sending…');
+      fetch(API, {
+        method: 'POST',
+        headers: Object.assign({}, headers, { Prefer: 'return=minimal' }),
+        body: JSON.stringify({ name: name, message: message }),
+      })
+        .then(function (res) {
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          form.reset();
+          counter.textContent = '0 / 500';
+          setStatus('Thanks! Your message is up.');
+          return load();
+        })
+        .catch(function (err) {
+          console.error('Guestbook send failed:', err);
+          setStatus("Sorry, that didn't send. Please try again.", true);
+        })
+        .finally(function () { sendButton.disabled = false; });
+    });
+
+    load();
+  })();
+</script>

@@ -1,0 +1,82 @@
+---
+import Base from '../../layouts/Base.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import { site } from '../../site.config';
+import { getServices, getPublishedProjects, serviceLabels } from '../../lib/content';
+
+const projects = await getPublishedProjects();
+const services = await getServices();
+const labels = await serviceLabels();
+// Only offer filters for categories that have published work (no empty pages).
+const categories = services.filter((s) => projects.some((p) => p.data.categories.some((c) => c.id === s.id)));
+---
+<Base title="Work" description="Selected projects and case studies by Lorenz Pepito: web design and development, graphic design, video editing, podcast editing and social media management.">
+  <section class="page-head">
+    <div class="wrap">
+      <p class="label">Work</p>
+      <h1>Selected projects.</h1>
+      <p class="lede">Real client work, with the problem, what I did and what changed.</p>
+    </div>
+  </section>
+
+  <section class="section-tight">
+    <div class="wrap">
+      {projects.length === 0 ? (
+        <div class="empty">
+          <p>Case studies are on their way. Want to see samples for your kind of project?</p>
+          <a class="btn btn-primary" href="/contact/">Ask me for samples</a>
+        </div>
+      ) : (
+        <>
+          {categories.length > 1 && (
+            <div class="filters" role="group" aria-label="Filter projects by service">
+              <button type="button" class="filter" data-filter="all" aria-pressed="true">All</button>
+              {categories.map((s) => (
+                <button type="button" class="filter" data-filter={s.id} aria-pressed="false">{s.data.title}</button>
+              ))}
+            </div>
+          )}
+          <div class="project-grid" id="project-grid">
+            {projects.map((p) => <ProjectCard project={p} labels={labels} headingLevel="h2" />)}
+          </div>
+          <p class="visually-hidden" id="filter-status" role="status" aria-live="polite"></p>
+        </>
+      )}
+      <p class="muted" style="margin-top:2rem">Looking for a type of work that isn't here yet? <a class="text-link" href="/contact/">Ask me for samples</a> or <a class="text-link" href={site.bookingUrl} target="_blank" rel="noopener">book a call</a>.</p>
+    </div>
+  </section>
+
+  <CtaBand heading="Want results like these?" />
+</Base>
+
+<script>
+  const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>('.filter'));
+  const cards = Array.from(document.querySelectorAll<HTMLElement>('#project-grid .project-card'));
+  const statusEl = document.getElementById('filter-status');
+
+  function apply(filter: string) {
+    let shown = 0;
+    for (const card of cards) {
+      const match = filter === 'all' || (card.dataset.categories || '').split(' ').includes(filter);
+      card.hidden = !match;
+      if (match) shown++;
+    }
+    for (const b of buttons) b.setAttribute('aria-pressed', String(b.dataset.filter === filter));
+    if (statusEl) statusEl.textContent = shown + ' project' + (shown === 1 ? '' : 's') + ' shown';
+  }
+
+  if (buttons.length) {
+    for (const b of buttons) {
+      b.addEventListener('click', () => {
+        const f = b.dataset.filter || 'all';
+        apply(f);
+        const url = new URL(location.href);
+        if (f === 'all') url.searchParams.delete('category'); else url.searchParams.set('category', f);
+        history.replaceState(null, '', url);
+      });
+    }
+    const wanted = new URL(location.href).searchParams.get('category');
+    if (wanted && buttons.some((b) => b.dataset.filter === wanted)) apply(wanted);
+  }
+</script>
