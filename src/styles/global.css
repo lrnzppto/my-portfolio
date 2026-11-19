@@ -37,6 +37,8 @@ p { margin: 0 0 1rem; }
 .skip { position: absolute; left: -999px; top: 0; background: var(--ink); color: #fff; padding: .6rem 1rem; z-index: 20; }
 .skip:focus { left: 1rem; top: 1rem; }
 .wrap { width: min(100% - 2.5rem, var(--max)); margin-inline: auto; }
+/* The hidden attribute must always win over component display rules (e.g. .form { display: grid }). */
+[hidden] { display: none !important; }
 .visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 
 /* Header */
