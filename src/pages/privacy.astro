@@ -1,0 +1,30 @@
+---
+import Base from '../layouts/Base.astro';
+import { site } from '../site.config';
+---
+<Base title="Privacy" description="How this website handles your information.">
+  <section class="page-head">
+    <div class="wrap">
+      <p class="label">Privacy</p>
+      <h1>Privacy notice</h1>
+      <p class="lede">Short version: I only collect what you send me, and I only use it to reply to you.</p>
+    </div>
+  </section>
+  <section class="section-tight">
+    <div class="wrap prose">
+      <h2>What I collect</h2>
+      <ul>
+        <li><strong>Contact form:</strong> your name, email, business or website, the services you're interested in, your project description, budget range, timeline, how you found me, and your browser's time zone.</li>
+        <li><strong>Guestbook:</strong> the name and message you choose to post. These are public on the About page.</li>
+        <li><strong>Call booking:</strong> handled by Calendly under its own privacy policy.</li>
+      </ul>
+      <h2>How it's used</h2>
+      <p>Inquiry details are used only to respond to your inquiry and, if we work together, to run the project. They are never sold or shared for marketing.</p>
+      <h2>Where it's stored</h2>
+      <p>Form and guestbook data are stored in a Supabase database. The website is hosted on Vercel, which keeps standard server logs. Fonts are loaded from Google Fonts. This site does not use advertising or tracking cookies.</p>
+      <h2>Your choices</h2>
+      <p>To see, correct or delete what you sent, {site.email ? <>email <a href={'mailto:' + site.email}>{site.email}</a></> : <>send a request through the <a href="/contact/">contact page</a></>} and I'll take care of it.</p>
+      <p class="muted">Last updated: November 2026</p>
+    </div>
+  </section>
+</Base>

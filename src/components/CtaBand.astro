@@ -1,0 +1,33 @@
+---
+import { site } from '../site.config';
+
+interface Props {
+  label?: string;
+  heading?: string;
+  text?: string;
+  primaryHref?: string;
+  primaryLabel?: string;
+}
+
+const {
+  label = 'Next step',
+  heading = 'Have a project in mind?',
+  text = 'Book a free discovery call or send a few details about your project. You will hear back ' + site.replyTime + '.',
+  primaryHref = site.bookingUrl,
+  primaryLabel = 'Book a discovery call',
+} = Astro.props;
+const external = primaryHref.startsWith('http');
+---
+<section>
+  <div class="wrap">
+    <div class="band">
+      <p class="label">{label}</p>
+      <h2>{heading}</h2>
+      <p>{text}</p>
+      <div class="cta" style="margin-top:.5rem">
+        <a class="btn btn-primary" href={primaryHref} target={external ? '_blank' : undefined} rel={external ? 'noopener' : undefined}>{primaryLabel}</a>
+        <a class="btn btn-ghost" href="/contact/">Send an inquiry</a>
+      </div>
+    </div>
+  </div>
+</section>

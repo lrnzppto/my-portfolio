@@ -1,0 +1,104 @@
+---
+import { render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import { getPublishedProjects, serviceLabels } from '../../lib/content';
+
+export async function getStaticPaths() {
+  const projects = await getPublishedProjects();
+  return projects.map((project) => ({ params: { slug: project.id }, props: { project } }));
+}
+
+const { project } = Astro.props;
+const d = project.data;
+const { Content } = await render(project);
+const labels = await serviceLabels();
+const all = await getPublishedProjects();
+const catIds = d.categories.map((c) => c.id);
+const others = all.filter((p) => p.id !== project.id);
+const sameCategory = others.filter((p) => p.data.categories.some((c) => catIds.includes(c.id)));
+const related = [...sameCategory, ...others.filter((p) => !sameCategory.includes(p))].slice(0, 2);
+const clientLabel = d.anonymized ? 'Confidential client' : d.client;
+const firstService = catIds[0];
+---
+<Base title={d.title} description={d.summary} type="article">
+  <article>
+    <section class="page-head">
+      <div class="wrap">
+        <p class="label"><a href="/work/" style="text-decoration:none">Work</a> · {catIds.map((c) => labels[c] ?? c).join(' · ')}</p>
+        <h1>{d.title}</h1>
+        <p class="lede">{d.summary}</p>
+        {d.liveUrl && <a class="btn btn-ghost" href={d.liveUrl} target="_blank" rel="noopener">View the live project ↗</a>}
+      </div>
+    </section>
+
+    <section class="section-tight">
+      <div class="wrap">
+        <dl class="facts-row">
+          <div><dt>Client</dt><dd>{clientLabel}</dd></div>
+          <div><dt>Industry</dt><dd>{d.clientType}</dd></div>
+          <div><dt>My role</dt><dd>{d.role}</dd></div>
+          {d.tools.length > 0 && <div><dt>Tools</dt><dd>{d.tools.join(', ')}</dd></div>}
+        </dl>
+
+        {d.media.length > 0 && (
+          <div class="media-grid">
+            {d.media.map((m) => (
+              <figure class={'media ' + m.orientation + (m.type === 'embed' ? ' embed' : '')}>
+                {m.type === 'image' && <img src={m.src} alt={m.alt} loading="lazy" decoding="async" />}
+                {m.type === 'video' && (
+                  <video controls playsinline preload="none" poster={m.poster} aria-label={m.alt}>
+                    <source src={m.src} />
+                    {m.poster && <img src={m.poster} alt={m.alt} />}
+                  </video>
+                )}
+                {m.type === 'embed' && <iframe src={m.src} title={m.alt} loading="lazy" allow="fullscreen; picture-in-picture" allowfullscreen></iframe>}
+                {m.caption && <figcaption>{m.caption}</figcaption>}
+              </figure>
+            ))}
+          </div>
+        )}
+
+        <div class="case">
+          <div>
+            <h2>The challenge</h2>
+            <p>{d.challenge}</p>
+          </div>
+          <div>
+            <h2>What I did</h2>
+            <p>{d.approach}</p>
+            <Content />
+          </div>
+          <div>
+            <h2>The result</h2>
+            <p>{d.outcome}</p>
+            {d.metrics.length > 0 && (
+              <ul class="metrics">
+                {d.metrics.map((m) => <li><strong>{m.value}</strong>{m.label}</li>)}
+              </ul>
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
+  </article>
+
+  <CtaBand
+    label="Start a similar project"
+    heading="Want something like this for your brand?"
+    primaryHref={'/contact/?service=' + firstService}
+    primaryLabel="Start a similar project"
+  />
+
+  {related.length > 0 && (
+    <section aria-labelledby="related-title">
+      <div class="wrap">
+        <div class="section-head"><h2 id="related-title">More work</h2></div>
+        <div class="project-grid">
+          {related.map((p) => <ProjectCard project={p} labels={labels} />)}
+        </div>
+      </div>
+    </section>
+  )}
+</Base>

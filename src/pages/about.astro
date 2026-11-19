@@ -1,0 +1,83 @@
+---
+import Base from '../layouts/Base.astro';
+import CtaBand from '../components/CtaBand.astro';
+import Guestbook from '../components/Guestbook.astro';
+import { site } from '../site.config';
+
+const toolGroups = [
+  { title: 'Frontend & mobile', items: ['React', 'Angular', 'JavaScript', 'Flutter', 'Xamarin'] },
+  { title: 'Backend & data', items: ['Spring Boot', 'ASP.NET', 'Dart', 'MySQL', 'Azure', 'Supabase'] },
+  { title: 'Creative', items: ['CapCut', 'Canva'] },
+  { title: 'Web & business', items: ['Wix', 'Notion', 'Mailchimp', 'Kajabi', 'Google Workspace'] },
+];
+---
+<Base title="About" description="Lorenz Pepito: Computer Engineer, former engineering team lead and Microsoft Azure certified developer, now a creative specialist for personal brands, coaches and small businesses.">
+  <section class="page-head">
+    <div class="wrap">
+      <p class="label">About</p>
+      <h1>Engineer's brain, creative's eye.</h1>
+      <p class="lede">I'm Lorenz Pepito, a Computer Engineer turned creative specialist, based in the {site.location.replace(' (UTC+8)', '')} and working with clients worldwide.</p>
+    </div>
+  </section>
+
+  <section class="section-tight">
+    <div class="wrap split">
+      <div>
+        <p>I spent over three years in professional software development, including leading a team of engineers building mobile and web applications. That work taught me to ship on time, think in systems and care about the person on the other side of the screen. I also worked on UI/UX improvements and a Java-to-Kotlin migration, and contributed to software launches that went out ahead of schedule.</p>
+        <p>Today I work independently with personal brands, coaches, creators and growing businesses. I design and build websites, edit video and podcasts, create graphics and manage social media. Because I can also handle the technical side, you get one reliable partner who can ship the website, edit the video, design the graphics and fix what's behind them, without handing your project between five freelancers.</p>
+        <p>On the social media side, I've helped accounts double their follower counts, reach engagement peaks of up to 200% and grow a community of 30,000 followers.</p>
+      </div>
+      <div class="facts" aria-label="Credentials">
+        <div class="fact"><strong>Computer Engineering</strong><span>Academic background</span></div>
+        <div class="fact"><strong>3+ years</strong><span>Professional software development (2022 to 2025)</span></div>
+        <div class="fact"><strong>Team lead</strong><span>Led engineers building mobile and web apps</span></div>
+        <div class="fact"><strong>AZ-104 · AZ-204</strong><span>Microsoft Certified: Azure Administrator Associate and Azure Developer Associate</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="tools-title">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="label">Toolkit</p>
+        <h2 id="tools-title">Tools I work with.</h2>
+      </div>
+      <div class="stack">
+        {toolGroups.map((g) => (
+          <div>
+            <h3>{g.title}</h3>
+            <ul class="chips">{g.items.map((t) => <li>{t}</li>)}</ul>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="working-title">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="label">Working together</p>
+        <h2 id="working-title">Remote by default.</h2>
+      </div>
+      <ul class="checklist">
+        <li>Based in the {site.location}, working with clients worldwide.</li>
+        <li>Discovery calls booked online, shown in your own time zone.</li>
+        <li>Replies to new inquiries {site.replyTime}.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section aria-labelledby="beyond-title">
+    <div class="wrap">
+      <div class="band">
+        <p class="label">Off the clock</p>
+        <h2 id="beyond-title">Rhythm is part of the work.</h2>
+        <p>Outside client work I'm a professional Afro dancer known as Nana Kojo and a co-founder of Afro Cebu. Performing taught me timing, discipline and how to hold an audience, and all three end up in what I build and edit.</p>
+      </div>
+    </div>
+  </section>
+
+  <Guestbook />
+
+  <CtaBand />
+</Base>

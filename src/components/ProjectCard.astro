@@ -1,0 +1,31 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+  labels: Record<string, string>;
+  headingLevel?: 'h2' | 'h3';
+}
+
+const { project, labels, headingLevel = 'h3' } = Astro.props;
+const d = project.data;
+const cats = d.categories.map((c) => c.id);
+const firstImage = d.media.find((m) => m.type === 'image')?.src;
+const firstPoster = d.media.find((m) => m.poster)?.poster;
+const cover = d.cover ?? firstImage ?? firstPoster;
+const Heading = headingLevel;
+---
+<article class="project-card" data-categories={cats.join(' ')}>
+  <a class="project-link" href={'/work/' + project.id + '/'}>
+    {cover ? (
+      <img src={cover} alt="" loading="lazy" decoding="async" width="640" height="400" />
+    ) : (
+      <div class="project-cover-fallback" aria-hidden="true"><span>{d.anonymized ? d.clientType : d.client}</span></div>
+    )}
+    <div class="project-body">
+      <p class="project-cats">{cats.map((c) => labels[c] ?? c).join(' · ')}</p>
+      <Heading>{d.title}</Heading>
+      <p>{d.summary}</p>
+    </div>
+  </a>
+</article>

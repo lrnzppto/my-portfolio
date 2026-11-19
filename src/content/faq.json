@@ -1,0 +1,44 @@
+[
+  {
+    "id": "time-zones",
+    "order": 1,
+    "draft": true,
+    "question": "You are in the Philippines. How do time zones work?",
+    "answer": "CONFIRM: I am based in the Philippines (UTC+8). Add the hours you overlap with US clients and how quickly you reply."
+  },
+  {
+    "id": "communication",
+    "order": 2,
+    "draft": true,
+    "question": "How do we communicate during a project?",
+    "answer": "CONFIRM: list the channels you use (for example email, Slack, WhatsApp) and how often you send updates."
+  },
+  {
+    "id": "revisions",
+    "order": 3,
+    "draft": true,
+    "question": "How many revisions are included?",
+    "answer": "CONFIRM: your revision policy per service."
+  },
+  {
+    "id": "turnaround",
+    "order": 4,
+    "draft": true,
+    "question": "How long does a project take?",
+    "answer": "CONFIRM: typical turnaround per service (for example short-form video, website)."
+  },
+  {
+    "id": "payment",
+    "order": 5,
+    "draft": true,
+    "question": "How do I pay?",
+    "answer": "CONFIRM: payment methods and terms (for example deposit, milestones)."
+  },
+  {
+    "id": "confidentiality",
+    "order": 6,
+    "draft": true,
+    "question": "Can you keep my project confidential?",
+    "answer": "CONFIRM: whether you sign NDAs and how you handle client files and access."
+  }
+]
